@@ -1,10 +1,11 @@
-
 import torch
 from torch import nn, Tensor
 from torchvision import transforms
 from torchvision.transforms import functional
 import os
 import logging
+import sys
+sys.path.append('/workspace/ComfyUI/')
 import folder_paths
 import comfy.utils
 from comfy.ldm.flux.layers import timestep_embedding
@@ -12,8 +13,8 @@ from insightface.app import FaceAnalysis
 from facexlib.parsing import init_parsing_model
 from facexlib.utils.face_restoration_helper import FaceRestoreHelper
 
-from .eva_clip.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
-from .encoders_flux import IDFormer, PerceiverAttentionCA
+from eva_clip.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
+from encoders_flux import IDFormer, PerceiverAttentionCA
 
 INSIGHTFACE_DIR = os.path.join(folder_paths.models_dir, "insightface")
 
@@ -210,7 +211,7 @@ class PulidFluxEvaClipLoader:
     CATEGORY = "pulid"
 
     def load_eva_clip(self):
-        from .eva_clip.factory import create_model_and_transforms
+        from eva_clip.factory import create_model_and_transforms
 
         model, _, _ = create_model_and_transforms('EVA02-CLIP-L-14-336', 'eva_clip', force_custom_clip=True)
 
@@ -369,7 +370,7 @@ class ApplyPulidFlux:
 
         # Patch the Flux model (original diffusion_model)
         # Nah, I don't care for the official ModelPatcher because it's undocumented!
-        # I want the end result now, and I don’t mind if I break other custom nodes in the process. 😄
+        # I want the end result now, and I don't mind if I break other custom nodes in the process. 😄
         flux_model = model.model.diffusion_model
         # Let's see if we already patched the underlying flux model, if not apply patch
         if not hasattr(flux_model, "pulid_ca"):
